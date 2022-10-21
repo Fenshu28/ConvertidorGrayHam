@@ -7,6 +7,25 @@ GString *Dato1, *Dato2;
 
 const char *Opciones[] = {"Selecciona una opción","Binario a Gray","Gray a Binario","Código Hamming","Errores en Hammings","Suma de números BDC"}; 
 
+void BinGray(GString *data, char *res){
+	int len = data->len -1, car1, car2;
+	
+	for(int i = 0; i <= len; i ++){
+		if(!i){
+			res[i] = data->str[i];
+		}else{
+			car1 = data->str[i] - '0';
+			car2 = data->str[i-1] - '0';
+			//g_print("car1: %d, car2: %d, sum: %d, i: %d\n",car1,car2,car1 + car2,i);
+			if((car1 + car2) == 2){
+				res[i] = '0';
+			}else{
+				res[i] = (car1 + car2) + '0';
+			}
+		}
+	}
+}
+
 void MsgBox(char *aviso){
 	 FrmDialog = gtk_message_dialog_new(GTK_WINDOW(window),GTK_DIALOG_DESTROY_WITH_PARENT,GTK_MESSAGE_INFO,GTK_BUTTONS_OK,"%s",aviso);
 	 gtk_dialog_run(GTK_DIALOG(FrmDialog));
@@ -20,6 +39,8 @@ int valid(GString *Data){
 		if((Data->str[i] != 48) && (Data->str[i] != 49)){
 			MsgBox("Solo ingresa 0 y 1.");
 			return 1;
+		}else{
+			return 0;
 		}
 	}
 }
@@ -30,15 +51,36 @@ void calcular(){
 	if((Dato1->len > 0) || (Dato2->len > 0)){
 		GString *Result = g_string_new("");
 		char Bina[MAXi] = {},Gray[MAXi] = {},Hamm[MAXi] = {},BCD1[MAXi] = {},BDC2[MAXi] = {};
-		int pos;
+		int pos = gtk_combo_box_get_active(GTK_COMBO_BOX(cmbOpc));
 		
 		if(valid(Dato1) || valid(Dato2)){
 			return;
 		}
 		
-		
-		
-		
+		switch (pos)
+		{
+			case 1:
+				BinGray(Dato1,Gray);
+				g_print("Bin Gray: %s \n",Gray);
+				
+				g_string_append_printf("El numero binario %d\nSe reprensenta en Gray como:\n-->%s",Gray);
+				break;
+			case 2:
+				
+				break;
+			case 3:
+				
+				break;
+			case 4:
+				
+				break;
+			case 5:
+				
+				break;
+			default:
+				
+		}
+				
 	}else{
 		MsgBox("Debe acompletar los campos.");
 	}
@@ -141,11 +183,14 @@ static void activate_win(GtkApplication *app, gpointer user_data){
     txtDato1 = gtk_entry_new();
     txtDato2 = gtk_entry_new();
     lbDesc = gtk_label_new("Programa convertidor de números Binarios,\nGray y Hamming,detección de errores en códigos\nHamming y suma de números BCD.");
+    lbResul = gtk_label_new("");
     lbDato1 = gtk_label_new("");
     lbDato2 = gtk_label_new("");
     gtk_label_set_justify(GTK_LABEL(lbDesc),GTK_JUSTIFY_CENTER);    
 
     // Señales
+    g_signal_connect(txtDato1,"changed",G_CALLBACK(RecDato),NULL);
+    g_signal_connect(txtDato2,"changed",G_CALLBACK(RecDato2),NULL);
     g_signal_connect(txtDato1,"activate",G_CALLBACK(calcular),NULL);
     g_signal_connect(txtDato2,"activate",G_CALLBACK(calcular),NULL);
     g_signal_connect(cmbOpc,"changed",G_CALLBACK(change_layout),NULL);
@@ -157,6 +202,8 @@ static void activate_win(GtkApplication *app, gpointer user_data){
     gtk_fixed_put(GTK_FIXED(fixed),txtDato1, 110, 80);
     gtk_fixed_put(GTK_FIXED(fixed),lbDato2, 110, 120);
     gtk_fixed_put(GTK_FIXED(fixed),txtDato2, 110, 140);
+    
+    
     
     // Agregando el fixed y el frame al box.
     gtk_box_pack_start(GTK_BOX(main_box), fixed,FALSE,FALSE,0);
